@@ -4,3 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.100"
+clap = { version = "4.5.55", features = ["derive"] }
+rayon = "1.11.0"
+markdown = "1.0.0"
+walkdir = "2.5.0"
+glob = "0.3.3"
+regex = "1.12.2"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1.0.149"
+shell-words = "1.1.1"
+similar = "=2.7.0"
