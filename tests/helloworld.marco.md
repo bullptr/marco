@@ -1,7 +1,11 @@
 ---
 name: Test Echo
 author: Marco Polo
-runner: echo
+runner: {
+    windows: Write-Output "Noice World",
+    unix: echo,
+    default: echo,
+}
 passing: true
 date: 2026-01-28
 ---

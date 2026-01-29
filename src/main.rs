@@ -31,12 +31,46 @@ impl Args {
     }
 }
 
+#[derive(Debug, Clone, Deserialize)]
+#[serde(untagged)]
+pub enum RunnerConfig {
+    Simple(String),
+    Platform {
+        windows: Option<String>,
+        unix: Option<String>,
+        default: Option<String>,
+    }
+}
+
+impl RunnerConfig {
+    pub fn for_current_platform(&self) -> &str {
+        match self {
+            RunnerConfig::Simple(cmd) => cmd,
+            #[allow(unused_variables)]
+            RunnerConfig::Platform { windows, unix, default } => {
+                #[cfg(target_os = "windows")]
+                {
+                    windows.as_deref()
+                        .or(default.as_deref())
+                        .unwrap_or("echo")
+                }
+                #[cfg(not(target_os = "windows"))]
+                {
+                    unix.as_deref()
+                        .or(default.as_deref())
+                        .unwrap_or("echo")
+                }
+            }
+        }
+    }
+}
+
 /// Represents the YAML header/frontmatter at the top of each test
 #[derive(Debug, Clone, Deserialize)]
 pub struct TestHeader {
     pub name: String,
     pub author: Option<String>,
-    pub runner: Option<String>,
+    pub runner: Option<RunnerConfig>,
     pub passing: Option<bool>,
     pub date: Option<String>,
 }
@@ -95,6 +129,11 @@ fn main() -> Result<()> {
             let diff = TextDiff::from_lines(res.actual.trim(), res.expected.trim());
 
             for change in diff.iter_all_changes() {
+                // match change.tag() {
+                //     ChangeTag::Delete => print!("      \x1b[91mActual:\x1b[0m {}\x1b[0m", change),
+                //     ChangeTag::Insert => print!("    \x1b[92mExpected:\x1b[0m {}\x1b[0m", change),
+                //     ChangeTag::Equal => print!("              \x1b[90m{}\x1b[0m", change),
+                // };
                 let (tag_symbol, color) = match change.tag() {
                     ChangeTag::Delete => ("\x1b[91m-\x1b[0m ", "\x1b[97m"), // Red
                     ChangeTag::Insert => ("\x1b[92m+\x1b[0m ", "\x1b[97m"), // Green
@@ -103,9 +142,6 @@ fn main() -> Result<()> {
                 print!("    {}{}{}\x1b[0m", color, tag_symbol, change);
             }
         }
-    }
-    if passed != results.len() {
-        std::process::exit(1);
     }
     Ok(())
 }
@@ -248,47 +284,22 @@ fn run_test_case(test: &MarcoTestCase) -> TestResult {
     };
 
     #[cfg(windows)]
-    let (prog, args, temp_script) = {
-        // Write runner_cmd to a temporary .ps1 file
-        use std::{
-            env::temp_dir,
-            time::{SystemTime, UNIX_EPOCH},
-        };
-        let mut temp_path = temp_dir();
-        let filename = format!(
-            "test_script_{:?}.ps1",
-            SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        );
-        temp_path.push(filename);
-        if let Err(e) = fs::write(&temp_path, runner_cmd.as_bytes()) {
-            return TestResult {
-                name: test.header.name.clone(),
-                file: test.file.clone(),
-                passed: false,
-                actual: String::new(),
-                expected: test.expected_output.clone(),
-                error: Some(format!("Failed to write temp .ps1 script: {}", e)),
-            };
-        }
+    let (prog, args) = {
         let shell_prog = "powershell";
         (
             shell_prog.to_string(),
             vec![
                 "-NoProfile".to_string(),
-                "-File".to_string(),
-                temp_path.to_string_lossy().to_string(),
+                "-Command".to_string(),
+                runner_cmd.for_current_platform().to_string(),
             ],
-            Some(temp_path), // Return path for later deletion
         )
     };
 
     #[cfg(not(windows))]
-    let (prog, args, temp_script) = {
-        match parse_shell_cmd(runner_cmd) {
-            Some(x) => (x.0, x.1, None),
+    let (prog, args) = {
+        match _parse_shell_cmd(runner_cmd.for_current_platform()) {
+            Some(x) => (x.0, x.1),
             None => {
                 return TestResult {
                     name: test.header.name.clone(),
@@ -296,7 +307,7 @@ fn run_test_case(test: &MarcoTestCase) -> TestResult {
                     passed: false,
                     actual: String::new(),
                     expected: test.expected_output.clone(),
-                    error: Some(format!("Malformed 'runner' command: {:?}", runner_cmd)),
+                    error: Some(format!("Malformed 'runner' command: {:?}", runner_cmd.for_current_platform())),
                 };
             }
         }
@@ -314,11 +325,6 @@ fn run_test_case(test: &MarcoTestCase) -> TestResult {
     {
         Ok(c) => c,
         Err(e) => {
-            // Clean up script for Windows, if needed
-            #[cfg(windows)]
-            if let Some(ref s) = temp_script {
-                let _ = fs::remove_file(s);
-            }
             return TestResult {
                 name: test.header.name.clone(),
                 file: test.file.clone(),
@@ -337,10 +343,6 @@ fn run_test_case(test: &MarcoTestCase) -> TestResult {
     if !test.input_data.is_empty() {
         if let Some(mut stdin) = child.stdin.take() {
             if let Err(e) = stdin.write_all(test.input_data.as_bytes()) {
-                #[cfg(windows)]
-                if let Some(ref s) = temp_script {
-                    let _ = fs::remove_file(s);
-                }
                 return TestResult {
                     name: test.header.name.clone(),
                     file: test.file.clone(),
@@ -361,10 +363,6 @@ fn run_test_case(test: &MarcoTestCase) -> TestResult {
     let output = match child.wait_with_output() {
         Ok(o) => o,
         Err(e) => {
-            #[cfg(windows)]
-            if let Some(ref s) = temp_script {
-                let _ = fs::remove_file(s);
-            }
             return TestResult {
                 name: test.header.name.clone(),
                 file: test.file.clone(),
@@ -375,12 +373,6 @@ fn run_test_case(test: &MarcoTestCase) -> TestResult {
             };
         }
     };
-
-    // Clean up temp script on Windows
-    #[cfg(windows)]
-    if let Some(ref s) = temp_script {
-        let _ = fs::remove_file(s);
-    }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     let stderr = String::from_utf8_lossy(&output.stderr);

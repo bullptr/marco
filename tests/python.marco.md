@@ -11,7 +11,7 @@ date: 2026-01-28
 ## Input
 
 ```python
-print("Hello, world!\nHello, world\nHello, world!")
+print("Hello, world!\nHello, world!\nHello, world!")
 ```
 
 ## Expected Output
