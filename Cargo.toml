@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-clap = { version = "4.5.55", features = ["derive"] }
+clap = { version = "4.5.55", features = ["derive", "env"] }
 rayon = "1.11.0"
 markdown = "1.0.0"
 walkdir = "2.5.0"

@@ -4,4 +4,4 @@ all: test
 
 test:
 	@cls
-	@cargo run -- -i "./tests/*.marco.md"
+	@cargo run -- -i "./tests/*.marco.md" --verbose

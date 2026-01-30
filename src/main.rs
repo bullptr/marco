@@ -20,6 +20,14 @@ pub struct Args {
     /// Glob or direct file for test collection (default: "**/*.marco.md")
     #[clap(short, long, default_value = "**/*.marco.md")]
     pub input: String,
+
+    /// Maximum number of threads to use in parallel (default: num_cpus)
+    #[clap(long, env = "MARCO_MAX_THREADS", value_name = "N")]
+    pub threads: Option<usize>,
+
+    // Verbose output
+    #[clap(short, long, default_value_t = false)]
+    pub verbose: bool,
 }
 
 impl Args {
@@ -39,7 +47,7 @@ pub enum RunnerConfig {
         windows: Option<String>,
         unix: Option<String>,
         default: Option<String>,
-    }
+    },
 }
 
 impl RunnerConfig {
@@ -47,18 +55,18 @@ impl RunnerConfig {
         match self {
             RunnerConfig::Simple(cmd) => cmd,
             #[allow(unused_variables)]
-            RunnerConfig::Platform { windows, unix, default } => {
+            RunnerConfig::Platform {
+                windows,
+                unix,
+                default,
+            } => {
                 #[cfg(target_os = "windows")]
                 {
-                    windows.as_deref()
-                        .or(default.as_deref())
-                        .unwrap_or("echo")
+                    windows.as_deref().or(default.as_deref()).unwrap_or("echo")
                 }
                 #[cfg(not(target_os = "windows"))]
                 {
-                    unix.as_deref()
-                        .or(default.as_deref())
-                        .unwrap_or("echo")
+                    unix.as_deref().or(default.as_deref()).unwrap_or("echo")
                 }
             }
         }
@@ -99,6 +107,19 @@ pub struct TestResult {
 fn main() -> Result<()> {
     let mut args = Args::parse();
     args = args.set_defaults();
+
+    // rayon configuration (new)
+    if let Some(n_threads) = args.threads {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(n_threads)
+            .build_global()
+            .map_err(|e| anyhow!("Failed to set thread pool: {:?}", e))?;
+
+        if args.verbose {
+            println!("Thread pool set to {n_threads} threads.");
+        }
+    }
+
     let files: Vec<PathBuf> = glob(&args.input)?.collect::<Result<Vec<_>, _>>()?;
     println!("Found {} markdown files for `{}`", files.len(), &args.input);
     if files.is_empty() {
@@ -129,11 +150,6 @@ fn main() -> Result<()> {
             let diff = TextDiff::from_lines(res.actual.trim(), res.expected.trim());
 
             for change in diff.iter_all_changes() {
-                // match change.tag() {
-                //     ChangeTag::Delete => print!("      \x1b[91mActual:\x1b[0m {}\x1b[0m", change),
-                //     ChangeTag::Insert => print!("    \x1b[92mExpected:\x1b[0m {}\x1b[0m", change),
-                //     ChangeTag::Equal => print!("              \x1b[90m{}\x1b[0m", change),
-                // };
                 let (tag_symbol, color) = match change.tag() {
                     ChangeTag::Delete => ("\x1b[91m-\x1b[0m ", "\x1b[97m"), // Red
                     ChangeTag::Insert => ("\x1b[92m+\x1b[0m ", "\x1b[97m"), // Green
@@ -307,7 +323,10 @@ fn run_test_case(test: &MarcoTestCase) -> TestResult {
                     passed: false,
                     actual: String::new(),
                     expected: test.expected_output.clone(),
-                    error: Some(format!("Malformed 'runner' command: {:?}", runner_cmd.for_current_platform())),
+                    error: Some(format!(
+                        "Malformed 'runner' command: {:?}",
+                        runner_cmd.for_current_platform()
+                    )),
                 };
             }
         }
