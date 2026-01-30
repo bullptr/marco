@@ -1,8 +1,8 @@
 ---
 name: Test Echo
 author: Marco Polo
-runner: {
-    windows: Write-Output "Noice World",
+runner: { # @TODO support without curly braces
+    windows: Write-Output,
     unix: echo,
     default: echo,
 }

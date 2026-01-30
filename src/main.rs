@@ -10,7 +10,7 @@ use markdown::mdast::Node;
 use markdown::{ParseOptions, to_mdast};
 use rayon::prelude::*;
 use serde::Deserialize;
-use serde_yaml;
+use serde_yml;
 use shell_words;
 use similar::{ChangeTag, TextDiff};
 
@@ -185,7 +185,7 @@ fn parse_test_markdown(file: PathBuf, src: &str) -> Result<Vec<MarcoTestCase>> {
                     .collect::<Vec<_>>()
                     .join("");
 
-                let header: TestHeader = serde_yaml::from_str(&frontmatter)
+                let header: TestHeader = serde_yml::from_str(&frontmatter)
                     .map_err(|e| anyhow!("Failed to parse frontmatter as header: {}", e))?;
 
                 // Now advance until we find "Test:" and then "Input" and "Expected Output"
