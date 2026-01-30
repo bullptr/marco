@@ -1,7 +1,7 @@
 ---
 name: Z Echo
 author: Marco Polo
-runner: echo
+runner: python
 passing: true
 date: 2026-01-28
 ---
@@ -11,7 +11,7 @@ date: 2026-01-28
 ## Input
 
 ```
-Hello, world!
+print("Hello, world!")
 ```
 
 ## Expected Output

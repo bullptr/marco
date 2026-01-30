@@ -138,14 +138,18 @@ fn main() -> Result<()> {
     println!("\nResults: {} passed / {} total", passed, results.len());
     for res in &results {
         if res.passed {
-            println!("✅ {} \x1b[90m(in {:?})\x1b[0m", res.name, res.file);
+            println!(
+                "\x1b[92m✔\x1b[0m {} \x1b[90m(in {:?})\x1b[0m",
+                res.name, res.file
+            );
         } else {
-            println!("❌ {} \x1b[90m(in {:?})\x1b[0m", res.name, res.file);
+            println!(
+                "\x1b[91m✘\x1b[0m {} \x1b[90m(in {:?})\x1b[0m",
+                res.name, res.file
+            );
             if let Some(err) = &res.error {
                 println!("    Error: {}", err);
             }
-            // println!("    Expected: {}", res.expected.trim());
-            // println!("    Actual:   {}", res.actual.trim());
 
             let diff = TextDiff::from_lines(res.actual.trim(), res.expected.trim());
 
