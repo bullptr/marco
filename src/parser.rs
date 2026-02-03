@@ -1,9 +1,13 @@
-use crate::test_types::{MarcoTestCase, TestHeader};
-use anyhow::{Context, Result, anyhow};
-use markdown::mdast::Node;
-use markdown::{ParseOptions, to_mdast};
 use std::fs;
 use std::path::PathBuf;
+
+use anyhow::{Context, Result, anyhow};
+use dom_query::Document;
+use markdown::mdast::Node;
+use markdown::{ParseOptions, to_html, to_mdast};
+use serde_yml;
+
+use crate::test_types::{MarcoTestCase, TestHeader};
 
 /// Collects all test cases from the set of markdown test files
 pub fn collect_tests(files: &[PathBuf]) -> Result<Vec<MarcoTestCase>> {
@@ -19,7 +23,6 @@ pub fn collect_tests(files: &[PathBuf]) -> Result<Vec<MarcoTestCase>> {
 
 /// Parses a markdown file and extracts a list of test cases
 pub fn parse_test_markdown(file: PathBuf, src: &str) -> Result<Vec<MarcoTestCase>> {
-    use serde_yml;
     let mut result = Vec::new();
     let options = ParseOptions::default();
     let tree = to_mdast(src, &options).map_err(|e| anyhow!("Failed to parse markdown: {}", e))?;
@@ -102,5 +105,25 @@ pub fn parse_test_markdown(file: PathBuf, src: &str) -> Result<Vec<MarcoTestCase
         }
     }
 
+    parse_test_markdown_html(file, src)?;
+
     Ok(result)
+}
+
+/// Parses a markdown file and extracts a list of test cases
+pub fn parse_test_markdown_html(_file: PathBuf, src: &str) -> Result<Vec<MarcoTestCase>> {
+    let html = to_html(src);
+    let document = Document::from(html.clone());
+
+    println!("Document: {:#?}", html);
+    
+
+    if let Some(h1) = document.try_select("h1") {
+        let text = h1.text().to_string();
+        println!("First header: {:#?}", text);
+    } else {
+        println!("No header found");
+    }
+
+    Ok(vec![])
 }
