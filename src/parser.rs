@@ -50,11 +50,14 @@ pub fn parse_test_markdown_html(file: PathBuf, src: &str) -> Result<Vec<MarcoTes
                 header.name = format!("{}: {}", header.name, title);
             }
 
+            // replace "\n" with "\r\n"; byproduct of dom_query parsing
+            let input_data = pair[0].text().to_string().replace("\n", "\r\n");
+            let expected_output = pair[1].text().to_string().replace("\n", "\r\n");
             let test_case = MarcoTestCase {
                 header: header.clone(),
                 file: file.clone(),
-                input_data: pair[0].text().to_string(),
-                expected_output: pair[1].text().to_string(),
+                input_data,
+                expected_output,
                 block_start_line: 0, // @TODO: try to get line number from HTML
             };
             result.push(test_case);
