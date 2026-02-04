@@ -1,5 +1,5 @@
 ---
-name: Multi-line test
+name: Multi-line values test
 runner: { windows: Write-Output, unix: echo, default: echo }
 ---
 
