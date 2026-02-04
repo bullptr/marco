@@ -10,7 +10,65 @@ passing: true
 date: 2026-01-28
 ---
 
-# Test: Echo
+# Test: Echo 1
+
+## Input
+
+Foo bar.
+
+```
+Hello, world!
+```
+
+## Expected Output
+
+```
+Hello, world!
+```
+
+# Test: Echo 2
+
+## Input
+
+```
+Hello, world!
+```
+
+## Expected Output
+
+```
+Hello, world!
+```
+
+# Test: Echo 3
+
+## Input
+
+```
+Hello, world!
+```
+
+## Expected Output
+
+```
+Hello, world!
+```
+
+# Test: Echo 4
+
+## Input
+
+```
+Hello, world!
+```
+
+## Expected Output
+
+```
+Hello, world!
+```
+
+# Test: Echo 5
 
 ## Input
 
