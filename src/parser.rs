@@ -34,8 +34,6 @@ pub fn parse_test_markdown_html(file: PathBuf, src: &str) -> Result<Vec<MarcoTes
         return Ok(vec![]);
     }
 
-    fs::write(file.with_extension("html"), &html)?;
-
     let frontmatter = frontmatter.unwrap().text();
     let header: TestHeader = serde_yml::from_str(&frontmatter)
         .map_err(|e| anyhow!("Failed to parse frontmatter as header: {}", e))?;
@@ -53,7 +51,7 @@ pub fn parse_test_markdown_html(file: PathBuf, src: &str) -> Result<Vec<MarcoTes
             let mut header = header.clone();
 
             if let Some(title) = get_el_title(pair[0].clone()) {
-                header.name = title;
+                header.name = format!("{}: {}", header.name, title);
             }
 
             let test_case = MarcoTestCase {
@@ -64,6 +62,11 @@ pub fn parse_test_markdown_html(file: PathBuf, src: &str) -> Result<Vec<MarcoTes
                 block_start_line: 0, // @TODO: try to get line number from HTML
             };
             result.push(test_case);
+        } else {
+            return Err(anyhow!(
+                "Unmatched input/expected output pair in file {:?}",
+                file
+            ));
         }
     }
 

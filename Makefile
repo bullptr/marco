@@ -6,6 +6,10 @@ test:
 	@cls
 	@cargo run -- -i "./tests/*.marco.md" --verbose
 
-hello:
+basic:
 	@cls
-	@cargo run -- -i "./tests/hello.marco.md"
+	@cargo run -- -i "./tests/basic.marco.md"
+
+multi:
+	@cls
+	@cargo run -- -i "./tests/multi-tests.marco.md"
