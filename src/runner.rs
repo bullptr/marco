@@ -1,21 +1,31 @@
-use crate::test_types::{MarcoTestCase, TestResult};
+use crate::types::{MarcoTestCase, TestResult};
 use crate::util::*;
 use std::io::Write;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
-pub fn run_test_case(test: &MarcoTestCase) -> TestResult {
+pub fn run_test_case(test: &MarcoTestCase, default_runner: Option<String>) -> TestResult {
+    // Pick runner: prefer test.header.runner, fallback to default_runner if present
     let runner_cmd = match &test.header.runner {
-        Some(cmd) => cmd,
+        Some(cmd) => cmd.for_current_platform(),
         None => {
-            return TestResult {
-                name: test.header.name.clone(),
-                file: test.file.clone(),
-                passed: false,
-                actual: String::new(),
-                expected: test.expected_output.clone(),
-                error: Some("No 'runner' command provided in test YAML header".to_string()),
-            };
+            // No runner in YAML, fallback to default_runner
+            match &default_runner {
+                Some(def_cmd) => def_cmd.as_str(),
+                None => {
+                    return TestResult {
+                        name: test.header.name.clone(),
+                        file: test.file.clone(),
+                        passed: false,
+                        actual: String::new(),
+                        expected: test.expected_output.clone(),
+                        error: Some(
+                            "No 'runner' command provided in test front matter or args"
+                                .to_string(),
+                        ),
+                    };
+                }
+            }
         }
     };
 
@@ -27,14 +37,14 @@ pub fn run_test_case(test: &MarcoTestCase) -> TestResult {
             vec![
                 "-NoProfile".to_string(),
                 "-Command".to_string(),
-                runner_cmd.for_current_platform().to_string(),
+                runner_cmd.to_string(),
             ],
         )
     };
 
     #[cfg(not(windows))]
     let (prog, args) = {
-        match parse_shell_cmd(runner_cmd.for_current_platform()) {
+        match parse_shell_cmd(runner_cmd) {
             Some(x) => (x.0, x.1),
             None => {
                 return TestResult {
@@ -43,10 +53,7 @@ pub fn run_test_case(test: &MarcoTestCase) -> TestResult {
                     passed: false,
                     actual: String::new(),
                     expected: test.expected_output.clone(),
-                    error: Some(format!(
-                        "Malformed 'runner' command: {:?}",
-                        runner_cmd.for_current_platform()
-                    )),
+                    error: Some(format!("Malformed 'runner' command: {:?}", runner_cmd)),
                 };
             }
         }

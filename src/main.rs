@@ -1,7 +1,7 @@
 mod cli;
 mod parser;
 mod runner;
-mod test_types;
+mod types;
 mod util;
 
 use anyhow::Result;
@@ -39,7 +39,10 @@ fn main() -> Result<()> {
     }
     println!("Found {} tests in {} files.", tests.len(), files.len());
 
-    let results: Vec<_> = tests.par_iter().map(run_test_case).collect();
+    let results: Vec<_> = tests
+        .par_iter()
+        .map(|test| run_test_case(test, args.runner.clone()))
+        .collect();
 
     let passed = results.iter().filter(|r| r.passed).count();
     println!("\nResults: {} passed / {} total", passed, results.len());
