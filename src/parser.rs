@@ -7,7 +7,7 @@ use markdown::mdast::Node;
 use markdown::{ParseOptions, to_html, to_mdast};
 use serde_yml;
 
-use crate::test_types::{MarcoTestCase, TestHeader};
+use crate::types::{MarcoTestCase, TestHeader};
 
 /// Collects all test cases from the set of markdown test files
 pub fn collect_tests(files: &[PathBuf]) -> Result<Vec<MarcoTestCase>> {
@@ -39,11 +39,7 @@ pub fn parse_test_markdown_html(file: PathBuf, src: &str) -> Result<Vec<MarcoTes
         .map_err(|e| anyhow!("Failed to parse frontmatter as header: {}", e))?;
 
     // Collect all pre blocks' text into a Vec
-    let pre_blocks: Vec<_> = document
-        .select("pre")
-        .iter()
-        // .map(|el| el.text().to_string())
-        .collect();
+    let pre_blocks: Vec<_> = document.select("pre").iter().collect();
 
     // Pair every two <pre> blocks into a MarcoTestCase
     for pair in pre_blocks.chunks(2) {
@@ -114,7 +110,6 @@ pub fn parse_test_markdown(file: PathBuf, src: &str) -> Result<Vec<MarcoTestCase
                 let header: TestHeader = serde_yml::from_str(&frontmatter)
                     .map_err(|e| anyhow!("Failed to parse frontmatter as header: {}", e))?;
 
-                // Now advance until we find "Test:" and then "Input" and "Expected Output"
                 while let Some(Node::Heading(test_heading)) = iter.peek() {
                     if test_heading
                         .children

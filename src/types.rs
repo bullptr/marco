@@ -39,10 +39,7 @@ impl RunnerConfig {
 #[derive(Debug, Clone, Deserialize)]
 pub struct TestHeader {
     pub name: String,
-    pub author: Option<String>,
     pub runner: Option<RunnerConfig>,
-    pub passing: Option<bool>,
-    pub date: Option<String>,
 }
 
 #[allow(unused)]

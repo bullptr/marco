@@ -6,6 +6,10 @@ pub struct Args {
     #[clap(short, long, default_value = "**/*.marco.md")]
     pub input: String,
 
+    /// Command to run the tests with (overridden by "runner" field in test header)
+    #[clap(short, long)]
+    pub runner: Option<String>,
+
     /// Maximum number of threads to use in parallel (default: num_cpus)
     #[clap(long, env = "MARCO_MAX_THREADS", value_name = "N")]
     pub threads: Option<usize>,
