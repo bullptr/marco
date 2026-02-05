@@ -17,13 +17,13 @@ Options:
 
 ## Install marco 0.1.0
 
-### Install prebuilt binaries via shell script
+Install prebuilt binaries via shell script
 
 ```sh
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bullptr/marco/releases/download/v0.1.0/marco-installer.sh | sh
 ```
 
-### Install prebuilt binaries via powershell script
+Install prebuilt binaries via powershell script
 
 ```sh
 powershell -ExecutionPolicy Bypass -c "irm https://github.com/bullptr/marco/releases/download/v0.1.0/marco-installer.ps1 | iex"
