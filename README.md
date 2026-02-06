@@ -1,5 +1,11 @@
 # marco
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/bullptr/marco)
+![GitHub](https://img.shields.io/github/license/bullptr/marco)
+![GitHub all releases](https://img.shields.io/github/downloads/bullptr/marco/total)
+![GitHub repo size](https://img.shields.io/github/repo-size/bullptr/marco)
+![GitHub stars](https://img.shields.io/github/stars/bullptr/marco)
+
 A Markdown-based testing framework for command-line applications.
 
 ## Usage
