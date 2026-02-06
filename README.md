@@ -15,26 +15,26 @@ Options:
   -h, --help             Print help
 ```
 
-## Install marco 0.1.0
+## Install marco
 
 Install prebuilt binaries via shell script
 
 ```sh
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bullptr/marco/releases/download/v0.1.0/marco-installer.sh | sh
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/bullptr/marco/releases/latest/download/marco-installer.sh | sh
 ```
 
 Install prebuilt binaries via powershell script
 
 ```sh
-powershell -ExecutionPolicy Bypass -c "irm https://github.com/bullptr/marco/releases/download/v0.1.0/marco-installer.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/bullptr/marco/releases/latest/download/marco-installer.ps1 | iex"
 ```
 
-## Download marco 0.1.0
+## Download marco
 
 | File                                                                                                                                       | Platform            | Checksum                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| [marco-aarch64-apple-darwin.tar.xz](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-aarch64-apple-darwin.tar.xz)           | Apple Silicon macOS | [checksum](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-aarch64-apple-darwin.tar.xz.sha256)      |
-| [marco-x86_64-apple-darwin.tar.xz](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-x86_64-apple-darwin.tar.xz)             | Intel macOS         | [checksum](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-x86_64-apple-darwin.tar.xz.sha256)       |
-| [marco-x86_64-pc-windows-msvc.zip](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-x86_64-pc-windows-msvc.zip)             | x64 Windows         | [checksum](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-x86_64-pc-windows-msvc.zip.sha256)       |
-| [marco-aarch64-unknown-linux-gnu.tar.xz](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-aarch64-unknown-linux-gnu.tar.xz) | ARM64 Linux         | [checksum](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-aarch64-unknown-linux-gnu.tar.xz.sha256) |
-| [marco-x86_64-unknown-linux-gnu.tar.xz](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-x86_64-unknown-linux-gnu.tar.xz)   | x64 Linux           | [checksum](https://github.com/bullptr/marco/releases/download/v0.1.0/marco-x86_64-unknown-linux-gnu.tar.xz.sha256)  |
+| [marco-aarch64-apple-darwin.tar.xz](https://github.com/bullptr/marco/releases/latest/download/marco-aarch64-apple-darwin.tar.xz)           | Apple Silicon macOS | [checksum](https://github.com/bullptr/marco/releases/latest/download/marco-aarch64-apple-darwin.tar.xz.sha256)      |
+| [marco-x86_64-apple-darwin.tar.xz](https://github.com/bullptr/marco/releases/latest/download/marco-x86_64-apple-darwin.tar.xz)             | Intel macOS         | [checksum](https://github.com/bullptr/marco/releases/latest/download/marco-x86_64-apple-darwin.tar.xz.sha256)       |
+| [marco-x86_64-pc-windows-msvc.zip](https://github.com/bullptr/marco/releases/latest/download/marco-x86_64-pc-windows-msvc.zip)             | x64 Windows         | [checksum](https://github.com/bullptr/marco/releases/latest/download/marco-x86_64-pc-windows-msvc.zip.sha256)       |
+| [marco-aarch64-unknown-linux-gnu.tar.xz](https://github.com/bullptr/marco/releases/latest/download/marco-aarch64-unknown-linux-gnu.tar.xz) | ARM64 Linux         | [checksum](https://github.com/bullptr/marco/releases/latest/download/marco-aarch64-unknown-linux-gnu.tar.xz.sha256) |
+| [marco-x86_64-unknown-linux-gnu.tar.xz](https://github.com/bullptr/marco/releases/latest/download/marco-x86_64-unknown-linux-gnu.tar.xz)   | x64 Linux           | [checksum](https://github.com/bullptr/marco/releases/latest/download/marco-x86_64-unknown-linux-gnu.tar.xz.sha256)  |
