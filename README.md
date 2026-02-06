@@ -21,6 +21,8 @@ Options:
   -h, --help             Print help
 ```
 
+See this [example test file](https://github.com/bullptr/marco/blob/main/tests/python.marco.md) for more details on the test file format. Then run `marco` in the directory containing the test files to execute them.
+
 ## Install marco
 
 Install prebuilt binaries via shell script
